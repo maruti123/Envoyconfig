@@ -1,0 +1,21 @@
+virtual_hosts:
+            - name: local_service
+              domains: ["*"]
+              routes:
+              - match:
+                  prefix: "/route-with-filter-disabled"
+                route:
+                  host_rewrite: localhost
+                  cluster: grpc
+                  timeout: 5.00s
+                # per_filter_config disables the filter for this route
+                typed_per_filter_config:
+                  envoy.filters.http.grpc_http1_reverse_bridge:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_http1_reverse_bridge.v3.FilterConfigPerRoute
+                    disabled: true
+              - match:
+                  prefix: "/route-with-filter-enabled"
+                route:
+                  host_rewrite: localhost
+                  cluster: other
+                  timeout: 5.00s
